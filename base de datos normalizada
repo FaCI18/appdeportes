@@ -1,0 +1,165 @@
+CREATE DATABASE appdeportes;
+USE appdeportes;
+
+CREATE TABLE usuarios(
+    id_usuario INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(64) NOT NULL,
+    apellido_materno VARCHAR(64) NOT NULL,
+    apellido_paterno VARCHAR(64) NOT NULL,
+    email VARCHAR(128) NOT NULL,
+    pass VARCHAR(128) NOT NULL,
+    rol INT NOT NULL,
+    activado BOOLEAN not null DEFAULT 1,
+    responsabilidades BOOLEAN not null DEFAULT 0
+)ENGINE=InnoDB;
+
+INSERT INTO usuarios (nombre, apellido_materno, apellido_paterno, email, pass, rol) VALUES ('Admin', 'Administrador', 'Administrativo', 'admin@admin.com', '123', 1);
+
+CREATE TABLE datos_estudiantes(
+    id_dato_estudiante INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    dato VARCHAR(128) NOT NULL
+)ENGINE=InnoDB;
+
+-- Tabla con datos FIJOS y ESTATICOS
+INSERT INTO datos_estudiantes (dato) VALUES ('edad');
+INSERT INTO datos_estudiantes (dato) VALUES ('domicilio');
+INSERT INTO datos_estudiantes (dato) VALUES ('telefono');
+INSERT INTO datos_estudiantes (dato) VALUES ('fecha_nacimiento');
+INSERT INTO datos_estudiantes (dato) VALUES ('lugar_nacimiento');
+INSERT INTO datos_estudiantes (dato) VALUES ('peso');
+INSERT INTO datos_estudiantes (dato) VALUES ('estatura');
+INSERT INTO datos_estudiantes (dato) VALUES ('nivel_estudios');
+INSERT INTO datos_estudiantes (dato) VALUES ('ocupacion');
+INSERT INTO datos_estudiantes (dato) VALUES ('que_estudia');
+INSERT INTO datos_estudiantes (dato) VALUES ('profesion');
+INSERT INTO datos_estudiantes (dato) VALUES ('puesto');
+INSERT INTO datos_estudiantes (dato) VALUES ('interes');
+INSERT INTO datos_estudiantes (dato) VALUES ('disciplinas');
+
+CREATE TABLE datos(
+    id_dato INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    id_dato_estudiante INT,
+    id_usuario INT,
+    FOREIGN KEY (id_dato_estudiante) REFERENCES datos_estudiantes(id_dato_estudiante),
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario),
+    info VARCHAR(260)
+)ENGINE=InnoDB;
+
+CREATE TABLE psalud(
+    id_psalud INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT,
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario),
+    enfermedad VARCHAR(260) NOT NULL,
+    adjunto VARCHAR(260)
+)ENGINE=InnoDB;
+
+CREATE TABLE horario(
+    id_horario INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    hora VARCHAR(20) NOT NULL
+)ENGINE=InnoDB;
+
+INSERT INTO horario (hora) VALUES ('08:00 AM');
+INSERT INTO horario (hora) VALUES ('09:00 AM');
+INSERT INTO horario (hora) VALUES ('10:00 AM');
+INSERT INTO horario (hora) VALUES ('11:00 AM');
+INSERT INTO horario (hora) VALUES ('12:00 PM');
+INSERT INTO horario (hora) VALUES ('01:00 PM');
+INSERT INTO horario (hora) VALUES ('02:00 PM');
+INSERT INTO horario (hora) VALUES ('03:00 PM');
+INSERT INTO horario (hora) VALUES ('04:00 PM');
+INSERT INTO horario (hora) VALUES ('05:00 PM');
+INSERT INTO horario (hora) VALUES ('06:00 PM');
+INSERT INTO horario (hora) VALUES ('07:00 PM');
+
+CREATE TABLE clases (
+    id_clase INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(64) NOT NULL,
+    descripcion VARCHAR(500),
+    fecha_clase DATE,
+    id_horario INT,
+    cupos INT,
+    precio INT,
+    activado BOOLEAN not null DEFAULT 1,
+    FOREIGN KEY (id_horario) REFERENCES horario(id_horario) ON DELETE CASCADE
+)ENGINE=InnoDB;
+
+CREATE TABLE clases_profesores (
+    id_clase INT,
+    id_profesor INT,
+    PRIMARY KEY (id_clase, id_profesor),
+    FOREIGN KEY (id_clase) REFERENCES clases(id_clase) ON DELETE CASCADE,
+    FOREIGN KEY (id_profesor) REFERENCES usuarios(id_usuario) ON DELETE CASCADE
+)ENGINE=InnoDB;
+
+CREATE TABLE paquetes(
+    id_paquete INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(64) NOT NULL,
+    descripcion VARCHAR(500) NOT NULL,
+    fecha_inicio DATE NOT NULL,
+    fecha_fin DATE NOT NULL,
+    cantidadClases INT NOT NULL,
+    activado BOOLEAN not null DEFAULT 1,
+    precio FLOAT
+)ENGINE=InnoDB;
+
+INSERT INTO paquetes (nombre, descripcion, fecha_inicio, fecha_fin, cantidadClases, activado, precio)
+VALUES (
+    'Paquete Standard',
+    '3 clases a la semana, a elección del alumno',
+    CURDATE(),
+    '2100-12-31',
+    3,
+    1,
+    250
+);
+
+CREATE TABLE solicitudes_paquetes(
+    id_solicitud_paquete INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    id_paquete INT NULL,
+
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario),
+    FOREIGN KEY (id_paquete) REFERENCES paquetes(id_paquete)
+) ENGINE=InnoDB;
+
+CREATE TABLE solicitudes(
+    id_solicitud INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    id_clase INT NULL,
+    id_solicitud_paquete INT NULL,
+    estado_pago BOOLEAN,
+    adjunto VARCHAR(260),
+
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario),
+    FOREIGN KEY (id_clase) REFERENCES clases(id_clase),
+    FOREIGN KEY (id_solicitud_paquete) REFERENCES solicitudes_paquetes(id_solicitud_paquete)
+) ENGINE=InnoDB;
+
+CREATE TABLE notificaciones(
+    id_notificacion INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    id_emisor INT,
+    id_receptor INT,
+    FOREIGN KEY (id_emisor) REFERENCES usuarios(id_usuario),
+    FOREIGN KEY (id_receptor) REFERENCES usuarios(id_usuario),
+    id_clase INT NULL,
+    asunto VARCHAR(600),
+    mensaje VARCHAR(600),
+    FOREIGN KEY (id_clase) REFERENCES clases(id_clase),
+    adjunto VARCHAR(260)
+)ENGINE=InnoDB;
+
+CREATE TABLE noticias(
+    id_noticia INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    fecha DATE,
+    noticia VARCHAR(600)
+)ENGINE=InnoDB;
+
+CREATE TABLE imgIndice(
+    id_imagen INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    url_imagen VARCHAR(260)
+)ENGINE=InnoDB;
+
+INSERT INTO imgIndice (url_imagen) VALUES ('files/imgIndex/defaultImg1.jpg');
+INSERT INTO imgIndice (url_imagen) VALUES ('files/imgIndex/defaultImg2.jpg');
+INSERT INTO imgIndice (url_imagen) VALUES ('files/imgIndex/defaultImg3.jpg');
+INSERT INTO imgIndice (url_imagen) VALUES ('files/imgIndex/defaultImg4.jpg');
